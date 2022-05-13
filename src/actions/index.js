@@ -1,4 +1,5 @@
 import streams from '../apis/streams';
+import history from '../history';
 import { 
     SIGN_IN, 
     SIGN_OUT, 
@@ -8,6 +9,7 @@ import {
     DELETE_STREAM,
     EDIT_STREAM
 } from './types';
+
 
 export const signIn = (userId) => {
     return {
@@ -28,6 +30,7 @@ export const createStream = formValues => async (dispatch, getState) => {
     const response = await streams.post('/streams', { ...formValues, userId }); //1
 
     dispatch({ type: CREATE_STREAM, payload: response.data });
+    history.push('/'); //2
 };
 
 export const fetchStreams = () => async dispatch => {
@@ -43,17 +46,24 @@ export const fetchStream = id => async dispatch => {
 }
 
 export const editStream = (id, formValues) => async dispatch => {
-    const response = await streams.put(`/streams/${id}`, formValues);
+    const response = await streams.patch(`/streams/${id}`, formValues); //3
 
     dispatch({ type: EDIT_STREAM, payload: response.data });
+    history.push('/');
 }
 
 export const deleteStream = id => async dispatch => {
     await streams.delete(`/streams/${id}`);
 
     dispatch({ type: DELETE_STREAM, payload: id });
+    history.push('/');
 }
 
 
 
-// ...formValues -> get all values inputted in the form
+//1 ...formValues -> get all values inputted in the form
+
+//2 history.push('/') redirects users to given URL 
+
+//3 PUT requres substitute ALL values in the record with new values (except object ID) -->
+// --> use PATCH to change only desired properties
